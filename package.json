@@ -5,23 +5,23 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "auth": "tsx src/whatsapp-auth.ts",
-    "typecheck": "tsc --noEmit",
+    "build": "TMPDIR=$HOME/.tmp tsc",
+    "start": "TMPDIR=$HOME/.tmp node dist/index.js",
+    "dev": "TMPDIR=$HOME/.tmp tsx src/index.ts",
+    "auth": "TMPDIR=$HOME/.tmp tsx src/matrix-auth.ts",
+    "typecheck": "TMPDIR=$HOME/.tmp tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "better-sqlite3": "^11.8.1",
     "cron-parser": "^5.5.0",
-"pino": "^9.6.0",
+    "dotenv": "^16.4.5",
+    "matrix-js-sdk": "^40.2.0",
+    "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "qrcode-terminal": "^0.12.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
