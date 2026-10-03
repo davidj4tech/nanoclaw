@@ -16,7 +16,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1",
+    "better-sqlite3": "^12.11.1",
     "cron-parser": "^5.5.0",
     "dotenv": "^16.4.5",
     "matrix-js-sdk": "^40.2.0",
