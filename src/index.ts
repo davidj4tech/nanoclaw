@@ -42,6 +42,7 @@ import { formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
 import { NewMessage, RegisteredGroup } from './types.js';
 import { logger } from './logger.js';
+import { speak } from './speak.js';
 
 // Re-export for backwards compatibility during refactor
 export { escapeXml, formatMessages } from './router.js';
@@ -183,6 +184,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       if (text) {
         await matrix.sendMessage(chatJid, `${ASSISTANT_NAME}: ${text}`);
         outputSentToUser = true;
+        speak(text);
       }
       // Only reset idle timer on actual results, not session-update markers (result: null)
       resetIdleTimer();
