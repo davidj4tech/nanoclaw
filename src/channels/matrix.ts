@@ -7,8 +7,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { STORE_DIR } from '../config.js';
+import { Agent, fetch as undiciFetch } from 'undici';
 import { logger } from '../logger.js';
 import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
+
+// HTTP/1.1, one connection per request in flight. Node 26's fetch speaks
+// HTTP/2 to the homeserver, so every request shared one connection, and the
+// 30 s /sync long-poll held typing notices and replies until it returned
+// (a reply took 11-22 s to post; 2026-10-07).
+const h1Agent = new Agent({ allowH2: false });
+const matrixFetch = ((input: any, init?: any) =>
+  undiciFetch(input, { ...(init || {}), dispatcher: h1Agent })) as unknown as typeof fetch;
 
 export interface MatrixChannelOpts {
   onMessage: OnInboundMessage;
@@ -63,6 +72,7 @@ export class MatrixChannel implements Channel {
       userId: userId,
       accessToken: accessToken,
       deviceId: deviceId,
+      fetchFn: matrixFetch,
     });
 
     // Login if we don't have a valid token
