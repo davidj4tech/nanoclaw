@@ -115,7 +115,15 @@ export async function runContainerAgent(
     // Pixie's own settings only: no user hooks, plugins or MCP servers. On the
     // phone every one starts under proot, and loading the owner's ~20 hooks and
     // 3 MCP servers took a trivial reply from ~12 s to ~41 s (2026-10-06).
-    const agent = spawn('claude', ['--setting-sources', 'project', '--strict-mcp-config', '-'], {
+    // NANOCLAW_AGENT_SSH (e.g. pixie@red5): run the turn on that host instead.
+    // Its key's forced command there (pixie-agent) runs claude with the same
+    // lean flags in ~/groups/<folder>, as a user that can't read the owner's
+    // files. No proot: a reply in ~10-17 s instead of ~30-40 s (2026-10-07).
+    const remote = process.env.NANOCLAW_AGENT_SSH || '';
+    const [agentCmd, agentArgs] = remote
+      ? ['ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=20', '-o', 'ControlPath=none', remote, group.folder]]
+      : ['claude', ['--setting-sources', 'project', '--strict-mcp-config', '-']];
+    const agent = spawn(agentCmd, agentArgs, {
       stdio: ['pipe', 'pipe', 'pipe'],
       cwd: groupDir,
       env: {
