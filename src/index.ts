@@ -170,7 +170,9 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }, IDLE_TIMEOUT);
   };
 
-  await matrix.setTyping(chatJid, true);
+  // Not awaited: the typing notice can sit ~30 s behind the sync long-poll,
+  // and the agent should not wait on a cosmetic.
+  void matrix.setTyping(chatJid, true);
   let hadError = false;
   let outputSentToUser = false;
 

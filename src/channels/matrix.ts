@@ -124,6 +124,15 @@ export class MatrixChannel implements Channel {
       if (eventType !== 'm.room.message' && eventType !== 'm.room.encrypted') return;
       if (event.getSender() === this.client.getUserId()) return; // Ignore own messages
 
+      // Only listed senders reach the agent, which can act on this phone. Unset
+      // means everyone (the old behaviour); the room itself may be public.
+      const allowed = (process.env.NANOCLAW_ALLOWED_SENDERS || '')
+        .split(',').map((s) => s.trim()).filter(Boolean);
+      if (allowed.length && !allowed.includes(event.getSender() || '')) {
+        logger.warn({ sender: event.getSender() }, 'Message from a sender not in NANOCLAW_ALLOWED_SENDERS, ignored');
+        return;
+      }
+
       const roomId = room?.roomId;
       if (!roomId) return;
 

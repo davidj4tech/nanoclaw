@@ -112,7 +112,10 @@ export async function runContainerAgent(
 
   return new Promise((resolve) => {
     // Run Claude Code CLI directly
-    const agent = spawn('claude', ['-'], {
+    // Pixie's own settings only: no user hooks, plugins or MCP servers. On the
+    // phone every one starts under proot, and loading the owner's ~20 hooks and
+    // 3 MCP servers took a trivial reply from ~12 s to ~41 s (2026-10-06).
+    const agent = spawn('claude', ['--setting-sources', 'project', '--strict-mcp-config', '-'], {
       stdio: ['pipe', 'pipe', 'pipe'],
       cwd: groupDir,
       env: {
